@@ -1,10 +1,13 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize the Gemini client if API key is present
+// Initialize the Gemini client, checking localStorage first, then .env for fallback
 const getGenAIClient = () => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    throw new Error('Gemini API key is not configured. Please create a .env file and set VITE_GEMINI_API_KEY.');
+  const localKey = localStorage.getItem('gemini_api_key');
+  const envKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = localKey || envKey;
+
+  if (!apiKey || apiKey === 'your_gemini_api_key_here' || apiKey.trim() === '') {
+    throw new Error('Gemini API key is not configured. Please click the Settings (⚙️) icon to connect your key.');
   }
   return new GoogleGenerativeAI(apiKey);
 };

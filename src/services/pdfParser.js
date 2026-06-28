@@ -1,7 +1,7 @@
 import * as pdfjs from 'pdfjs-dist';
 
 // Set up the PDFjs worker URL dynamically in a Vite-compatible format
-import pdfjsWorker from 'pdfjs-dist/build/pdfjs.worker.min.mjs?url';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 /**

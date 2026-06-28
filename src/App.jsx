@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, AlertTriangle, FileText, CheckCircle2, History, RotateCcw } from 'lucide-react';
+import { Briefcase, AlertTriangle, RotateCcw } from 'lucide-react';
 import ThemeToggle from './components/ThemeToggle';
 import ResumeUpload from './components/ResumeUpload';
 import HistoryPanel from './components/HistoryPanel';

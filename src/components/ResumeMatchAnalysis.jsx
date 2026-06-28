@@ -9,7 +9,12 @@ export default function ResumeMatchAnalysis({ analysis }) {
     missingSkills = [],
     strengths = [],
     weaknesses = [],
-    improvementSuggestions = []
+    improvementSuggestions = [],
+    resumeMatchScore = 0,
+    atsScore = 0,
+    atsExplanation = '',
+    scoreBefore = 0,
+    scoreAfter = 0
   } = analysis;
 
   return (
@@ -30,6 +35,115 @@ export default function ResumeMatchAnalysis({ analysis }) {
           <h3 style={{ fontSize: '1rem', fontWeight: '700', margin: '0' }}>Resume Match Analysis Loaded</h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0' }}>
             We compared your resume with the job requirements. See below for gaps, strengths, and recommendations.
+          </p>
+        </div>
+      </div>
+
+      {/* Score Cards Grid */}
+      <div className="scores-grid" style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '1.5rem',
+        marginBottom: '0.5rem'
+      }}>
+        {/* Resume Match Score Card */}
+        <div className="score-card glass-panel" style={{
+          padding: '1.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', marginTop: '0' }}>
+            Resume Match Score
+          </h4>
+          <div style={{
+            fontSize: '3rem',
+            fontWeight: '800',
+            fontFamily: 'var(--font-heading)',
+            lineHeight: '1',
+            color: resumeMatchScore >= 90 ? 'var(--success)' : resumeMatchScore >= 70 ? 'var(--warning)' : 'var(--danger)',
+            transition: 'color var(--transition-normal)'
+          }}>
+            {resumeMatchScore}%
+          </div>
+          <div style={{
+            marginTop: '0.5rem',
+            fontSize: '0.8rem',
+            fontWeight: '600',
+            padding: '0.2rem 0.6rem',
+            borderRadius: 'var(--border-radius-full)',
+            backgroundColor: resumeMatchScore >= 90 ? 'var(--success-light)' : resumeMatchScore >= 70 ? 'rgba(245, 158, 11, 0.12)' : 'var(--danger-light)',
+            color: resumeMatchScore >= 90 ? 'var(--success)' : resumeMatchScore >= 70 ? 'var(--warning)' : 'var(--danger)'
+          }}>
+            {resumeMatchScore >= 90 ? 'Excellent Match' : resumeMatchScore >= 70 ? 'Good Match' : 'Low Match'}
+          </div>
+        </div>
+
+        {/* ATS Compatibility Card */}
+        <div className="score-card glass-panel" style={{
+          padding: '1.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center'
+        }}>
+          <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', marginTop: '0' }}>
+            ATS Compatibility
+          </h4>
+          <div style={{
+            fontSize: '3rem',
+            fontWeight: '800',
+            fontFamily: 'var(--font-heading)',
+            lineHeight: '1',
+            color: atsScore >= 90 ? 'var(--success)' : atsScore >= 70 ? 'var(--warning)' : 'var(--danger)',
+            marginBottom: '0.5rem'
+          }}>
+            {atsScore}%
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0', maxWidth: '300px', lineHeight: '1.4' }}>
+            {atsExplanation || 'Assesses layout readability, formatting structure, and keyword parsing compatibility.'}
+          </p>
+        </div>
+
+        {/* Resume Improvement Comparative Card */}
+        <div className="score-card glass-panel" style={{
+          padding: '1.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          gap: '0.5rem'
+        }}>
+          <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem', marginTop: '0' }}>
+            Optimization Impact
+          </h4>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', justifyContent: 'center', marginTop: '0.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Before</span>
+              <span style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-secondary)' }}>{scoreBefore}%</span>
+            </div>
+            <div style={{
+              fontSize: '1.25rem',
+              color: 'var(--accent)',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              ➔
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--accent)', textTransform: 'uppercase', fontWeight: '700' }}>After AI</span>
+              <span style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--success)' }}>{scoreAfter}%</span>
+            </div>
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0', lineHeight: '1.4', marginTop: '0.25rem' }}>
+            Potential alignment improvement by applying suggestions.
           </p>
         </div>
       </div>

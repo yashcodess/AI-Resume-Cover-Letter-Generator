@@ -10,6 +10,7 @@ import CoverLetterTailor from './components/CoverLetterTailor';
 
 import { SAMPLE_RESUME, SAMPLE_JOB_DESCRIPTION } from './utils/sampleData';
 import { getHistory, saveSession, deleteSession, clearAllHistory } from './services/historyService';
+import { analyzeResumeMatch, generateTailoredResume, generateCoverLetter } from './services/geminiService';
 
 export default function App() {
   const [resumeText, setResumeText] = useState('');
@@ -89,9 +90,38 @@ export default function App() {
       alert('Please provide both your resume and the target job description.');
       return;
     }
-    // Gemini API call integration happens in Milestone 7.
-    // For now, we will simulate a loading state and set dummy results so the UI can be previewed.
     setIsGenerating(true);
+    try {
+      const [matchRes, resumeRes, coverRes] = await Promise.all([
+        analyzeResumeMatch(resumeText, jobDescription),
+        generateTailoredResume(resumeText, jobDescription),
+        generateCoverLetter(resumeText, jobDescription, 'Professional', 'Standard')
+      ]);
+
+      const updatedHistory = saveSession({
+        resumeText,
+        jobDescription,
+        matchAnalysis: matchRes,
+        tailoredResume: resumeRes,
+        tailoredCoverLetter: coverRes
+      });
+
+      setMatchAnalysis(matchRes);
+      setTailoredResume(resumeRes);
+      setTailoredCoverLetter(coverRes);
+      setSessions(updatedHistory);
+      
+      if (updatedHistory && updatedHistory.length > 0) {
+        setActiveSessionId(updatedHistory[0].id);
+      }
+      
+      setActiveTab('match');
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'An error occurred during Gemini optimization. Please check your API key configuration.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (

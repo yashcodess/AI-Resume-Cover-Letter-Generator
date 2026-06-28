@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, AlertTriangle, RotateCcw } from 'lucide-react';
+import { Briefcase, AlertTriangle, RotateCcw, Settings } from 'lucide-react';
 import ThemeToggle from './components/ThemeToggle';
 import ResumeUpload from './components/ResumeUpload';
 import HistoryPanel from './components/HistoryPanel';
@@ -8,6 +8,7 @@ import ResumeMatchAnalysis from './components/ResumeMatchAnalysis';
 import ResumeTailor from './components/ResumeTailor';
 import CoverLetterTailor from './components/CoverLetterTailor';
 import EmptyState from './components/EmptyState';
+import ApiKeyModal from './components/ApiKeyModal';
 
 import { SAMPLE_RESUME, SAMPLE_JOB_DESCRIPTION } from './utils/sampleData';
 import { getHistory, saveSession, deleteSession, clearAllHistory } from './services/historyService';
@@ -19,7 +20,8 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [activeTab, setActiveTab] = useState('inputs');
-  const [apiKeyMissing, setApiKeyMissing] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [isApiModalOpen, setIsApiModalOpen] = useState(false);
 
   // Analysis result states
   const [matchAnalysis, setMatchAnalysis] = useState(null);
@@ -32,13 +34,26 @@ export default function App() {
 
   // Check for API key on load
   useEffect(() => {
-    const key = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!key || key === 'your_gemini_api_key_here') {
-      setApiKeyMissing(true);
+    const localKey = localStorage.getItem('gemini_api_key');
+    const envKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const key = localKey || envKey;
+
+    if (key && key !== 'your_gemini_api_key_here') {
+      setApiKey(key);
+    } else {
+      setApiKey('');
+      // Trigger modal pop-up on first launch if no key exists
+      setTimeout(() => setIsApiModalOpen(true), 800);
     }
     // Load history
     setSessions(getHistory());
   }, []);
+
+  const handleClearAllData = () => {
+    handleClearAll();
+    setSessions([]);
+    setApiKey('');
+  };
 
   const handleTextExtracted = (text) => {
     setResumeText(text);
@@ -164,38 +179,34 @@ export default function App() {
           </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <ThemeToggle />
+          <button 
+            onClick={() => setIsApiModalOpen(true)}
+            className="btn btn-ghost"
+            aria-label="Settings"
+            style={{
+              width: '40px',
+              height: '40px',
+              padding: '0',
+              borderRadius: 'var(--border-radius-full)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid var(--border-color)',
+              background: 'var(--bg-secondary)',
+              cursor: 'pointer',
+              transition: 'transform var(--transition-fast)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'rotate(45deg)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'rotate(0deg)'}
+          >
+            <Settings size={18} style={{ color: 'var(--text-secondary)', display: 'block' }} />
+          </button>
         </div>
       </header>
 
       <div className="container">
-        {/* API Key Missing Alert Banner */}
-        {apiKeyMissing && (
-          <div 
-            className="warning-banner glass-panel"
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '1rem',
-              padding: '1rem 1.5rem',
-              marginBottom: '1.5rem',
-              backgroundColor: 'rgba(245, 158, 11, 0.08)',
-              border: '1px solid rgba(245, 158, 11, 0.2)',
-              borderRadius: 'var(--border-radius-md)'
-            }}
-          >
-            <AlertTriangle className="warning-icon" size={24} style={{ color: 'var(--warning)', flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--warning)', marginBottom: '0.25rem' }}>
-                API Key Configuration Warning
-              </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0' }}>
-                No `VITE_GEMINI_API_KEY` was found in your environment. Please create a `.env` file in the root folder with your key to enable live AI analysis. You can still test the interface layouts and load sample inputs.
-              </p>
-            </div>
-          </div>
-        )}
 
         <div className="dashboard-grid" style={{
           display: 'grid',
@@ -348,15 +359,56 @@ export default function App() {
                     </div>
 
                     {/* Optimize CTA */}
-                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center', 
+                      marginTop: '2rem',
+                      gap: '1rem'
+                    }}>
                       <button 
                         onClick={triggerOptimization}
-                        disabled={!resumeText.trim() || !jobDescription.trim()}
+                        disabled={!resumeText.trim() || !jobDescription.trim() || !apiKey}
                         className="btn btn-primary btn-lg"
-                        style={{ padding: '1rem 3rem', fontSize: '1.1rem', width: '100%', maxWidth: '350px' }}
+                        style={{ 
+                          padding: '1rem 3rem', 
+                          fontSize: '1.1rem', 
+                          width: '100%', 
+                          maxWidth: '350px',
+                          opacity: (!resumeText.trim() || !jobDescription.trim() || !apiKey) ? 0.5 : 1
+                        }}
                       >
                         Optimize Resume & Letter
                       </button>
+                      
+                      {!apiKey && (
+                        <div className="warning-banner glass-panel animate-fade-in" style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '1.25rem 1.5rem',
+                          width: '100%',
+                          maxWidth: '450px',
+                          backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                          border: '1px dashed rgba(245, 158, 11, 0.3)',
+                          borderRadius: 'var(--border-radius-md)',
+                          textAlign: 'center',
+                          animation: 'fadeIn 0.3s ease-out'
+                        }}>
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0' }}>
+                            Please connect your Gemini API key to use AI features.
+                          </p>
+                          <button 
+                            onClick={() => setIsApiModalOpen(true)}
+                            className="btn btn-primary btn-sm"
+                            style={{ padding: '0.4rem 1.25rem', fontSize: '0.8rem' }}
+                          >
+                            Connect Gemini API Key
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -394,6 +446,13 @@ export default function App() {
           </main>
         </div>
       </div>
+
+      <ApiKeyModal 
+        isOpen={isApiModalOpen}
+        onClose={() => setIsApiModalOpen(false)}
+        onKeySaved={(newKey) => setApiKey(newKey)}
+        onClearAllData={handleClearAllData}
+      />
       
       {/* Styles for Tabs and app-specific utilities */}
       <style>{`

@@ -10,7 +10,7 @@
 
 An AI-powered web application that helps job seekers optimize their resumes, analyze alignment with job descriptions, and generate tailored resumes and cover letters using the Google Gemini API.
 
-[Features](#-features) • [Screenshots](#-screenshots) • [Installation](#-installation) • [How It Works](#-how-it-works) • [License](#-license)
+[Features](#-features) • [Screenshots](#-screenshots) • [Installation](#-installation) • [How It Works](#-how-it-works) • [Deployment](#-deploying-on-vercel) • [License](#-license)
 
 </div>
 
@@ -29,6 +29,7 @@ An AI-powered web application that helps job seekers optimize their resumes, ana
 - ✏️ **Side-by-Side Resume Tailor:** Compares your original resume with a Gemini-optimized Markdown resume side-by-side. Supports in-app editing, clipboard copies, and direct PDF printing.
 - ✉️ **Custom Cover Letter Generator:** Drafts a custom cover letter based on your experience and target job. Parameterize Tone (Professional, Bold, Enthusiastic, Creative) and Length (Short, Standard, Detailed) on the fly.
 - 💾 **Local Persistence (History Panel):** Tracks past analyses and saves them in the browser's `localStorage` so you can jump back to previous optimizations.
+- 🔑 **Browser API Key Configuration:** The application does not require a backend server. Input your own Gemini API key inside the Settings modal. It remains saved locally in your browser's memory and is sent directly to Google's endpoints.
 - 🌓 **Theme Toggle:** Smoothly toggle between deep-space Dark Mode and clean Light Mode.
 - 🧪 **One-Click Demo Data:** Load pre-made sample resumes and job requirements to test the optimizer instantly.
 
@@ -61,7 +62,7 @@ An AI-powered web application that helps job seekers optimize their resumes, ana
 
 ---
 
-## 🔧 Installation
+## 🔧 Installation & Running Locally
 
 Follow these steps to run the application locally:
 
@@ -79,42 +80,42 @@ cd AI-Resume-Optimizer
 npm install
 ```
 
-### 4. Setup Environment Variables
-Create a `.env` file in the root folder (copying from `.env.example`):
-```bash
-copy .env.example .env
-```
-Open the `.env` file in a text editor and enter your Gemini API key:
-```env
-VITE_GEMINI_API_KEY=your_actual_gemini_api_key_here
-```
-
-### 5. Start Dev Server
+### 4. Start Dev Server
 ```bash
 npm run dev
 ```
-Open your browser and navigate to `http://localhost:5173`.
+
+### 5. Open the Application
+1. Open your browser and navigate to `http://localhost:5173`.
+2. Connect your own Gemini API key when prompted on the first launch (or click the Settings ⚙️ gear icon in the header).
+3. Start using the application!
 
 ---
 
-## 🔑 API Setup
+## 🚀 Deploying on Vercel
+
+Since the application runs 100% client-side and requires zero backend server operations, it is perfectly suited for zero-cost static hosting on [Vercel](https://vercel.com).
+
+### Quick Deploy Steps:
+1. Push your repository to your GitHub account.
+2. Go to the [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New"** > **"Project"**.
+3. Import your `AI-Resume-Optimizer` repository.
+4. Click **"Deploy"** (Vite builds automatically).
+5. Open your deployed project URL, paste your Gemini API key in the popup modal, and begin analyzing!
+
+> [!TIP]
+> **Environment Fallback (Optional):** If you are hosting a personal demo and want to provide a fallback API key so visitors do not need to paste their own, you can add `VITE_GEMINI_API_KEY=your_key` in Vercel's **Environment Variables** panel during setup.
+
+---
+
+## 🔑 API Key Setup & Security
 
 To get a free Google Gemini API Key:
 1. Go to [Google AI Studio](https://aistudio.google.com/).
 2. Log in with your Google account.
 3. Click **"Get API key"** and create a key.
-4. Copy the API key and place it in the `VITE_GEMINI_API_KEY` parameter inside your `.env` file.
 
----
-
-## ⚙️ How It Works
-
-1. **Document Text Extraction:** The client-side parser `pdfParser.js` receives the file object from the drag-and-drop zones, loads the worker thread from PDF.js, and extracts text content page-by-page.
-2. **Parallel Processing:** When clicking "Optimize Resume", the application makes three concurrent asynchronous queries to the Gemini API to reduce wait times:
-   - **Match Analysis:** Queries `gemini-2.5-flash` forcing a structured JSON output (via `responseSchema`) to guarantee structured skills badges and recommendations.
-   - **Tailored Resume:** Rephrases resume experiences, inserting keywords in Markdown format.
-   - **Cover Letter:** Generates a cover letter based on user resume, job, tone, and length parameters.
-3. **Session Cache:** The session details are saved in `localStorage`, adding a timestamped card in the History sidebar for persistence.
+🔒 **Security Standard:** Your API key is stored strictly inside `localStorage` in your local browser client. The application is completely serverless; the key is sent directly from your browser to Google's official Gemini endpoint (`https://generativelanguage.googleapis.com`) and is never uploaded, tracked, or saved on any third-party server.
 
 ---
 
@@ -140,6 +141,7 @@ AI-Resume-Optimizer/
     │   ├── ResumeUpload.jsx        # PDF drag-and-drop parser
     │   ├── LoadingProgress.jsx     # Step-by-step progress indicator
     │   ├── EmptyState.jsx          # Reusable empty tabs graphics
+    │   ├── ApiKeyModal.jsx         # Gemini API Key configuration
     │   ├── ResumeMatchAnalysis.jsx # Skills-matching cards
     │   ├── ResumeTailor.jsx        # Side-by-side resume editor & text download
     │   └── CoverLetterTailor.jsx   # Cover letter builder & text download
@@ -150,15 +152,6 @@ AI-Resume-Optimizer/
     └── utils/
         └── sampleData.js           # Preloaded resume and job descriptions
 ```
-
----
-
-## 🔮 Future Improvements
-
-- [ ] **Google Docs Integration:** Connect Google Drive API to import resumes and export tailored outputs directly to Google Docs.
-- [ ] **DOCX Downloads:** Add native `.docx` formatting support using Javascript document libraries.
-- [ ] **Multiple Formatting Templates:** Introduce professional formatting themes (Harvard style, Creative designer layouts, Classic academic structures).
-- [ ] **Interactive Inline Suggestions:** Let users click specific recommendations to auto-apply edits directly into the tailored editor.
 
 ---
 

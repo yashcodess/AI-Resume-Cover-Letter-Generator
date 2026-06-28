@@ -85,6 +85,21 @@ export default function App() {
     handleClearAll();
   };
 
+  const handleCoverLetterUpdated = (newLetter) => {
+    setTailoredCoverLetter(newLetter);
+    if (activeSessionId) {
+      const history = getHistory();
+      const updated = history.map((session) => {
+        if (session.id === activeSessionId) {
+          return { ...session, tailoredCoverLetter: newLetter };
+        }
+        return session;
+      });
+      localStorage.setItem('ai_resume_optimizer_history', JSON.stringify(updated));
+      setSessions(updated);
+    }
+  };
+
   const triggerOptimization = async () => {
     if (!resumeText.trim() || !jobDescription.trim()) {
       alert('Please provide both your resume and the target job description.');
@@ -357,7 +372,12 @@ export default function App() {
                 )}
 
                 {activeTab === 'cover_letter' && tailoredCoverLetter && (
-                  <CoverLetterTailor coverLetter={tailoredCoverLetter} />
+                  <CoverLetterTailor 
+                    resumeText={resumeText}
+                    jobDescription={jobDescription}
+                    coverLetter={tailoredCoverLetter} 
+                    onCoverLetterUpdated={handleCoverLetterUpdated}
+                  />
                 )}
               </div>
             )}

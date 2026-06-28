@@ -18,7 +18,7 @@ const getGenAIClient = () => {
 export async function analyzeResumeMatch(resumeText, jobDescription) {
   const genAI = getGenAIClient();
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema: {
@@ -55,9 +55,40 @@ export async function analyzeResumeMatch(resumeText, jobDescription) {
               },
               required: ['section', 'suggestion']
             }
+          },
+          resumeMatchScore: {
+            type: 'integer',
+            description: 'A percentage score representing candidate-job skill and experience match (0-100)'
+          },
+          atsScore: {
+            type: 'integer',
+            description: 'A percentage compatibility score based on formatting, scanning readability, and structure (0-100)'
+          },
+          atsExplanation: {
+            type: 'string',
+            description: 'A short explanation (1-2 sentences) of why this ATS compatibility score was assigned'
+          },
+          scoreBefore: {
+            type: 'integer',
+            description: 'An estimated score of the resume alignment BEFORE suggestions are applied (0-100)'
+          },
+          scoreAfter: {
+            type: 'integer',
+            description: 'An estimated score of the resume alignment AFTER suggestions are applied (0-100)'
           }
         },
-        required: ['matchingSkills', 'missingSkills', 'strengths', 'weaknesses', 'improvementSuggestions']
+        required: [
+          'matchingSkills', 
+          'missingSkills', 
+          'strengths', 
+          'weaknesses', 
+          'improvementSuggestions', 
+          'resumeMatchScore', 
+          'atsScore', 
+          'atsExplanation', 
+          'scoreBefore', 
+          'scoreAfter'
+        ]
       }
     }
   });
@@ -91,7 +122,7 @@ export async function analyzeResumeMatch(resumeText, jobDescription) {
  */
 export async function generateTailoredResume(resumeText, jobDescription) {
   const genAI = getGenAIClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `
     You are an expert executive resume writer. Tailor the candidate's resume to better align with the provided job description.
@@ -129,7 +160,7 @@ export async function generateTailoredResume(resumeText, jobDescription) {
  */
 export async function generateCoverLetter(resumeText, jobDescription, tone, length) {
   const genAI = getGenAIClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `
     You are a professional career coach writing a tailored cover letter.

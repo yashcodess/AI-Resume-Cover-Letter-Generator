@@ -1,5 +1,5 @@
-export const SAMPLE_RESUME = `Yash Sharma
-yash@example.com | (123) 456-7890 | github.com/yashsharma
+export const SAMPLE_RESUME = `Yash Mohite
+yash@example.com | (123) 456-7890 | github.com/yashmohite
 
 SUMMARY
 Enthusiastic Frontend Developer with 3 years of experience building web applications. Passionate about JavaScript, React, HTML5, and CSS3. Experienced in optimizing client-side performance and collaborating with cross-functional teams to deliver quality codebases.

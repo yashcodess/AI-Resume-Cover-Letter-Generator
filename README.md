@@ -1,31 +1,52 @@
 # AI Resume Optimizer
 
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2018.0.0-blue.svg)](https://nodejs.org/)
+[![React Version](https://img.shields.io/badge/react-%5E19.0.0-blue.svg)](https://react.dev/)
+[![Vite Version](https://img.shields.io/badge/vite-%5E8.0.0-purple.svg)](https://vite.dev/)
+[![Gemini API](https://img.shields.io/badge/Gemini%20API-Flash--2.5-orange.svg)](https://ai.google.dev/)
+
 An AI-powered web application that helps job seekers optimize their resumes, analyze alignment with job descriptions, and generate tailored resumes and cover letters using the Google Gemini API.
 
-This project is built as a highly polished, responsive web dashboard supporting both **Dark** and **Light** themes. It runs entirely client-side, using local browser storage to save optimization runs, which makes it perfect for free static web hosting.
+[Features](#-features) • [Screenshots](#-screenshots) • [Installation](#-installation) • [How It Works](#-how-it-works) • [License](#-license)
+
+</div>
 
 ---
 
-## 🚀 Live Demo & Screenshots
-
-> [!NOTE]
-> *Insert screenshots or screen recordings here once deployed to showcase the beautiful glassmorphism panels, circular loading bars, and light/dark theme swaps.*
-
----
-
-## ✨ Features
+## 🌟 Features
 
 - 📄 **Client-Side PDF Text Extraction:** Drag and drop your resume PDF or TXT directly into the browser. Text is extracted locally using `pdfjs-dist` without uploading files to any external server.
-- 🎯 **Resume Match Analysis:** Replaces raw numerical scores with a detailed dashboard listing:
-  - **Matching Skills:** Keywords and skills identified in both your resume and the job requirements.
-  - **Missing Skills / Gaps:** Core requirements in the job description that your resume lacks.
-  - **Strengths & Weaknesses:** Key highlights and areas of concern analyzed by AI.
-  - **Actionable Section-by-Section Suggestions:** Actionable recommendations for sections like Summary, Experience, or Skills.
+- 📊 **Resume Match Analysis:** Replaces raw numerical scores with a detailed dashboard listing:
+  - **Match Score:** A percentage score calculating overall alignment (Green for 90+, Orange for 70-89, Red for below 70).
+  - **ATS Compatibility Score:** An evaluation of layout formatting, scanning readability, and structure.
+  - **Optimization Impact Card:** Displays a comparative check: estimated alignment before and after suggesting changes.
+  - **Matching Skills & Gaps:** Tags showing keywords matched and core skills missing from the requirements.
+  - **Strengths & Weaknesses:** Detailed insights into what makes the resume stand out and where it falls short.
+  - **Actionable Section-by-Section Suggestions:** Structured recommendations for sections like Summary, Experience, or Skills.
 - ✏️ **Side-by-Side Resume Tailor:** Compares your original resume with a Gemini-optimized Markdown resume side-by-side. Supports in-app editing, clipboard copies, and direct PDF printing.
 - ✉️ **Custom Cover Letter Generator:** Drafts a custom cover letter based on your experience and target job. Parameterize Tone (Professional, Bold, Enthusiastic, Creative) and Length (Short, Standard, Detailed) on the fly.
 - 💾 **Local Persistence (History Panel):** Tracks past analyses and saves them in the browser's `localStorage` so you can jump back to previous optimizations.
 - 🌓 **Theme Toggle:** Smoothly toggle between deep-space Dark Mode and clean Light Mode.
 - 🧪 **One-Click Demo Data:** Load pre-made sample resumes and job requirements to test the optimizer instantly.
+
+---
+
+## 📸 Screenshots
+
+### 1. Dashboard Inputs
+![Dashboard Inputs](./public/screenshots/home.png)
+
+### 2. Resume Match Analysis
+![Match Analysis](./public/screenshots/analysis.png)
+
+### 3. Side-by-Side Resume Editor
+![Tailored Resume](./public/screenshots/resume.png)
+
+### 4. Cover Letter Document Panel
+![Cover Letter](./public/screenshots/cover-letter.png)
 
 ---
 
@@ -40,40 +61,7 @@ This project is built as a highly polished, responsive web dashboard supporting 
 
 ---
 
-## 📦 Folder Structure
-
-```
-AI-Resume-Optimizer/
-├── .env.example              # Environment variables template
-├── .gitignore                # Files excluded from git
-├── index.html                # Main entry HTML (imports Outfit & Inter fonts)
-├── package.json              # App dependencies & scripts
-├── vite.config.js            # Vite configuration
-├── README.md                 # Project documentation
-├── public/                   # Favicons and SVG icons
-└── src/
-    ├── main.jsx              # React app mount script
-    ├── App.jsx               # Main state coordinator & dashboard layout
-    ├── index.css             # Base styles, animation keyframes, theme variables
-    ├── components/           # Subcomponents
-    │   ├── ThemeToggle.jsx         # Dark/Light theme switcher
-    │   ├── HistoryPanel.jsx        # Sidebar managing localStorage session logs
-    │   ├── ResumeUpload.jsx        # Drag-and-drop file parsing widget
-    │   ├── LoadingProgress.jsx     # Step-by-step progress scanner
-    │   ├── ResumeMatchAnalysis.jsx # Skills-matching comparison boards
-    │   ├── ResumeTailor.jsx        # Side-by-side optimized resume view
-    │   └── CoverLetterTailor.jsx   # Customizable letter generator
-    ├── services/             # Core integrations
-    │   ├── geminiService.js        # Gemini SDK configuration, schemas, and prompts
-    │   ├── historyService.js       # LocalStorage CRUD utilities
-    │   └── pdfParser.js            # Client-side PDF.js extractor
-    └── utils/
-        └── sampleData.js           # Demo Resume and Job Description data
-```
-
----
-
-## 🔧 Installation & Setup
+## 🔧 Installation
 
 Follow these steps to run the application locally:
 
@@ -91,16 +79,14 @@ cd AI-Resume-Optimizer
 npm install
 ```
 
-### 4. Configure Gemini API Key
-Obtain a free API Key from [Google AI Studio](https://aistudio.google.com/). 
-
+### 4. Setup Environment Variables
 Create a `.env` file in the root folder (copying from `.env.example`):
 ```bash
-cp .env.example .env
+copy .env.example .env
 ```
-Open `.env` and paste your key:
+Open the `.env` file in a text editor and enter your Gemini API key:
 ```env
-VITE_GEMINI_API_KEY=your_actual_gemini_api_key
+VITE_GEMINI_API_KEY=your_actual_gemini_api_key_here
 ```
 
 ### 5. Start Dev Server
@@ -111,26 +97,80 @@ Open your browser and navigate to `http://localhost:5173`.
 
 ---
 
-## 💡 Usage Guide
+## 🔑 API Setup
 
-1. **Load Demo:** If you want a quick demonstration, click the **"Load Sample Resume"** and **"Load Sample Job Description"** buttons.
-2. **Upload custom resume:** Click the drag-and-drop box to upload your resume (PDF or TXT).
-3. **Insert Job Description:** Paste the text of the job description you want to optimize for in the second column.
-4. **Trigger optimization:** Click **"Optimize Resume & Letter"**.
-5. **Review analysis:** Inspect matching and missing keywords, strengths, and recommendations.
-6. **Tailored assets:** Click the **"Tailored Resume"** tab to compare or print to PDF. Move to the **"Cover Letter"** tab, adjust tone, and copy the letter.
+To get a free Google Gemini API Key:
+1. Go to [Google AI Studio](https://aistudio.google.com/).
+2. Log in with your Google account.
+3. Click **"Get API key"** and create a key.
+4. Copy the API key and place it in the `VITE_GEMINI_API_KEY` parameter inside your `.env` file.
+
+---
+
+## ⚙️ How It Works
+
+1. **Document Text Extraction:** The client-side parser `pdfParser.js` receives the file object from the drag-and-drop zones, loads the worker thread from PDF.js, and extracts text content page-by-page.
+2. **Parallel Processing:** When clicking "Optimize Resume", the application makes three concurrent asynchronous queries to the Gemini API to reduce wait times:
+   - **Match Analysis:** Queries `gemini-2.5-flash` forcing a structured JSON output (via `responseSchema`) to guarantee structured skills badges and recommendations.
+   - **Tailored Resume:** Rephrases resume experiences, inserting keywords in Markdown format.
+   - **Cover Letter:** Generates a cover letter based on user resume, job, tone, and length parameters.
+3. **Session Cache:** The session details are saved in `localStorage`, adding a timestamped card in the History sidebar for persistence.
+
+---
+
+## 📁 Project Structure
+
+```
+AI-Resume-Optimizer/
+├── .env.example              # Environment variables template
+├── .gitignore                # Files excluded from git
+├── index.html                # Main entry HTML
+├── package.json              # App dependencies & scripts
+├── vite.config.js            # Vite configuration
+├── README.md                 # Project documentation
+├── public/                   # Favicons, icons, and screenshots
+│   └── screenshots/          # App UI screenshot files
+└── src/
+    ├── main.jsx              # React app mount script
+    ├── App.jsx               # Main state coordinator & dashboard layout
+    ├── index.css             # Base styles, animations, and theme variables
+    ├── components/           # UI Components
+    │   ├── ThemeToggle.jsx         # Dark/Light theme switcher
+    │   ├── HistoryPanel.jsx        # Sidebar session logger
+    │   ├── ResumeUpload.jsx        # PDF drag-and-drop parser
+    │   ├── LoadingProgress.jsx     # Step-by-step progress indicator
+    │   ├── EmptyState.jsx          # Reusable empty tabs graphics
+    │   ├── ResumeMatchAnalysis.jsx # Skills-matching cards
+    │   ├── ResumeTailor.jsx        # Side-by-side resume editor & text download
+    │   └── CoverLetterTailor.jsx   # Cover letter builder & text download
+    ├── services/             # Core Services
+    │   ├── geminiService.js        # Gemini SDK schemas and prompt functions
+    │   ├── historyService.js       # LocalStorage history database helper
+    │   └── pdfParser.js            # PDF.js text extraction wrapper
+    └── utils/
+        └── sampleData.js           # Preloaded resume and job descriptions
+```
 
 ---
 
 ## 🔮 Future Improvements
 
-- [ ] **Multi-Format Export:** Directly export tailored resumes to DOCX format.
-- [ ] **Interactive Resume Editor:** Allow users to accept specific AI suggestions, auto-applying changes into the tailored text.
-- [ ] **Custom Styling Templates:** Provide multiple professional resume formatting templates (e.g. Creative, Harvard, Executive).
-- [ ] **Google Drive Integration:** Allow direct importing from and exporting to Google Docs.
+- [ ] **Google Docs Integration:** Connect Google Drive API to import resumes and export tailored outputs directly to Google Docs.
+- [ ] **DOCX Downloads:** Add native `.docx` formatting support using Javascript document libraries.
+- [ ] **Multiple Formatting Templates:** Introduce professional formatting themes (Harvard style, Creative designer layouts, Classic academic structures).
+- [ ] **Interactive Inline Suggestions:** Let users click specific recommendations to auto-apply edits directly into the tailored editor.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute it for personal or commercial projects.
+This project is licensed under the [MIT License](LICENSE). Feel free to use and adapt it for personal or professional portfolios.
+
+---
+
+## 🤝 Acknowledgements
+
+- Google Generative AI Team for the [Gemini API](https://ai.google.dev/).
+- Mozilla for [PDF.js](https://mozilla.github.io/pdf.js/).
+- The Lucide contributors for [Lucide Icons](https://lucide.dev/).
+- The React and Vite teams for modern dev tooling.

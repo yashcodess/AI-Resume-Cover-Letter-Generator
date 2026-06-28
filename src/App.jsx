@@ -7,6 +7,7 @@ import LoadingProgress from './components/LoadingProgress';
 import ResumeMatchAnalysis from './components/ResumeMatchAnalysis';
 import ResumeTailor from './components/ResumeTailor';
 import CoverLetterTailor from './components/CoverLetterTailor';
+import EmptyState from './components/EmptyState';
 
 import { SAMPLE_RESUME, SAMPLE_JOB_DESCRIPTION } from './utils/sampleData';
 import { getHistory, saveSession, deleteSession, clearAllHistory } from './services/historyService';
@@ -237,23 +238,20 @@ export default function App() {
                     Inputs Workspace
                   </button>
                   <button 
-                    onClick={() => matchAnalysis && setActiveTab('match')}
+                    onClick={() => setActiveTab('match')}
                     className={`tab-btn ${activeTab === 'match' ? 'active' : ''}`}
-                    disabled={!matchAnalysis}
                   >
                     Match Analysis
                   </button>
                   <button 
-                    onClick={() => tailoredResume && setActiveTab('resume')}
+                    onClick={() => setActiveTab('resume')}
                     className={`tab-btn ${activeTab === 'resume' ? 'active' : ''}`}
-                    disabled={!tailoredResume}
                   >
                     Tailored Resume
                   </button>
                   <button 
-                    onClick={() => tailoredCoverLetter && setActiveTab('cover_letter')}
+                    onClick={() => setActiveTab('cover_letter')}
                     className={`tab-btn ${activeTab === 'cover_letter' ? 'active' : ''}`}
-                    disabled={!tailoredCoverLetter}
                   >
                     Tailored Cover Letter
                   </button>
@@ -363,21 +361,33 @@ export default function App() {
                   </div>
                 )}
 
-                {activeTab === 'match' && matchAnalysis && (
-                  <ResumeMatchAnalysis analysis={matchAnalysis} />
+                {activeTab === 'match' && (
+                  matchAnalysis ? (
+                    <ResumeMatchAnalysis analysis={matchAnalysis} />
+                  ) : (
+                    <EmptyState tabName="Match Analysis" onNavigateToInputs={() => setActiveTab('inputs')} />
+                  )
                 )}
 
-                {activeTab === 'resume' && tailoredResume && (
-                  <ResumeTailor originalText={resumeText} tailoredText={tailoredResume} />
+                {activeTab === 'resume' && (
+                  tailoredResume ? (
+                    <ResumeTailor originalText={resumeText} tailoredText={tailoredResume} />
+                  ) : (
+                    <EmptyState tabName="Tailored Resume" onNavigateToInputs={() => setActiveTab('inputs')} />
+                  )
                 )}
 
-                {activeTab === 'cover_letter' && tailoredCoverLetter && (
-                  <CoverLetterTailor 
-                    resumeText={resumeText}
-                    jobDescription={jobDescription}
-                    coverLetter={tailoredCoverLetter} 
-                    onCoverLetterUpdated={handleCoverLetterUpdated}
-                  />
+                {activeTab === 'cover_letter' && (
+                  tailoredCoverLetter ? (
+                    <CoverLetterTailor 
+                      resumeText={resumeText}
+                      jobDescription={jobDescription}
+                      coverLetter={tailoredCoverLetter} 
+                      onCoverLetterUpdated={handleCoverLetterUpdated}
+                    />
+                  ) : (
+                    <EmptyState tabName="Tailored Cover Letter" onNavigateToInputs={() => setActiveTab('inputs')} />
+                  )
                 )}
               </div>
             )}

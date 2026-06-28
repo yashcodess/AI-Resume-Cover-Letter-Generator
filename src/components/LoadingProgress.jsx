@@ -60,29 +60,54 @@ export default function LoadingProgress({ onCancel }) {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      gap: '2rem',
-      minHeight: '500px',
-      justifyContent: 'center'
+      gap: '2.25rem',
+      minHeight: '550px',
+      justifyContent: 'center',
+      maxWidth: '650px',
+      margin: '0 auto'
     }}>
-      <div className="loader-scanner" style={{ position: 'relative' }}>
-        <Loader2 className="animate-spin" size={48} style={{ color: 'var(--accent)', animation: 'spin 1.5s linear infinite' }} />
+      <div className="loader-scanner" style={{ 
+        position: 'relative',
+        width: '90px',
+        height: '90px',
+        borderRadius: 'var(--border-radius-full)',
+        backgroundColor: 'var(--accent-light)',
+        border: '1px solid rgba(99, 102, 241, 0.2)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: 'var(--shadow-accent)',
+        animation: 'pulseGlow 2s infinite ease-in-out'
+      }}>
+        <Loader2 className="animate-spin" size={36} style={{ color: 'var(--accent)', animation: 'spin 1.2s linear infinite' }} />
+        {/* Scanning laser line mockup */}
+        <div style={{
+          position: 'absolute',
+          left: '10%',
+          right: '10%',
+          height: '2px',
+          background: 'var(--accent)',
+          boxShadow: '0 0 8px var(--accent)',
+          animation: 'scannerLine 2s infinite ease-in-out',
+          opacity: 0.7
+        }} />
       </div>
 
       <div style={{ width: '100%', maxWidth: '450px' }}>
-        <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', fontWeight: '700' }}>
-          Optimizing with Gemini AI...
+        <h2 style={{ fontSize: '1.3rem', marginBottom: '0.5rem', fontWeight: '800', fontFamily: 'var(--font-heading)' }}>
+          Optimizing with Gemini AI
         </h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-          This may take a moment. We are analyzing documents and generating tailored assets.
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.75rem' }}>
+          Analyzing credentials, matching core skills, and tailoring output files...
         </p>
 
         {/* Progress Bar */}
         <div style={{
-          height: '8px',
+          height: '6px',
           background: 'var(--bg-tertiary)',
           borderRadius: 'var(--border-radius-full)',
           overflow: 'hidden',
-          marginBottom: '2rem',
+          marginBottom: '2.25rem',
           position: 'relative'
         }}>
           <div style={{
@@ -100,10 +125,11 @@ export default function LoadingProgress({ onCancel }) {
           display: 'flex',
           flexDirection: 'column',
           gap: '1rem',
-          padding: '1rem',
+          padding: '1.25rem',
           backgroundColor: 'rgba(0, 0, 0, 0.15)',
           borderRadius: 'var(--border-radius-md)',
-          border: '1px solid var(--border-color)'
+          border: '1px solid var(--border-color)',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
         }}>
           {steps.map((step, index) => {
             const StepIcon = step.icon;
@@ -161,6 +187,24 @@ export default function LoadingProgress({ onCancel }) {
       >
         Cancel Generation
       </button>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes pulseGlow {
+          0% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.15); }
+          50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.35); }
+          100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.15); }
+        }
+        @keyframes scannerLine {
+          0% { top: 15%; opacity: 0; }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { top: 85%; opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }

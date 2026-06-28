@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Copy, Check, Printer, Edit2, Eye, Split } from 'lucide-react';
+import { Copy, Check, Printer, Edit2, Eye, Split, Download } from 'lucide-react';
 
 export default function ResumeTailor({ originalText, tailoredText }) {
   const [copied, setCopied] = useState(false);
@@ -12,6 +12,19 @@ export default function ResumeTailor({ originalText, tailoredText }) {
     navigator.clipboard.writeText(isEditing ? editedText : tailoredText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const textToDownload = isEditing ? editedText : tailoredText;
+    const blob = new Blob([textToDownload], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'optimized_resume.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handlePrint = () => {
@@ -149,6 +162,11 @@ export default function ResumeTailor({ originalText, tailoredText }) {
                 Copy Markdown
               </>
             )}
+          </button>
+
+          <button onClick={handleDownload} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+            <Download size={14} />
+            Download Tailored Resume (.txt)
           </button>
           
           <button onClick={handlePrint} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>

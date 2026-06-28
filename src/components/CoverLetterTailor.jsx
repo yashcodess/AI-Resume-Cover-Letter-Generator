@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Copy, Check, RefreshCw, Loader2 } from 'lucide-react';
+import { Copy, Check, RefreshCw, Loader2, Download } from 'lucide-react';
 import { generateCoverLetter } from '../services/geminiService';
 
 export default function CoverLetterTailor({ resumeText, jobDescription, coverLetter, onCoverLetterUpdated }) {
@@ -16,6 +16,18 @@ export default function CoverLetterTailor({ resumeText, jobDescription, coverLet
     navigator.clipboard.writeText(coverLetter);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([coverLetter], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'tailored_cover_letter.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleRegenerate = async () => {
@@ -96,6 +108,15 @@ export default function CoverLetterTailor({ resumeText, jobDescription, coverLet
               <RefreshCw size={14} />
             )}
             Regenerate Letter
+          </button>
+          
+          <button 
+            onClick={handleDownload}
+            className="btn btn-secondary btn-sm"
+            style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+          >
+            <Download size={14} />
+            Download Cover Letter (.txt)
           </button>
           
           <button onClick={handleCopy} className="btn btn-primary btn-sm" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>

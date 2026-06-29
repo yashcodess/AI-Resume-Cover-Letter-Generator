@@ -112,7 +112,7 @@ export async function analyzeResumeMatch(resumeText, jobDescription) {
     Perform a detailed analysis and fill out the JSON response schema. Be fair, objective, and search for equivalent synonyms (e.g. 'React.js' matches 'React').
   `;
 
-  const result = await model.generateContent(prompt);
+  const result = await callGeminiWithRetry(model, prompt);
   const responseText = result.response.text();
   return JSON.parse(responseText);
 }
@@ -149,7 +149,7 @@ export async function generateTailoredResume(resumeText, jobDescription) {
     Generate the tailored resume in Markdown format:
   `;
 
-  const result = await model.generateContent(prompt);
+  const result = await callGeminiWithRetry(model, prompt);
   return result.response.text();
 }
 
@@ -189,6 +189,124 @@ export async function generateCoverLetter(resumeText, jobDescription, tone, leng
     Generate the cover letter in Markdown format:
   `;
 
-  const result = await model.generateContent(prompt);
+  const result = await callGeminiWithRetry(model, prompt);
   return result.response.text();
+}
+
+/**
+ * Extracts the HTTP status code or Gemini API error code from an error object.
+ * @param {Error} error - Caught error object
+ * @returns {number|null} HTTP status code or null if not found
+ */
+function getErrorStatusCode(error) {
+  const message = error?.message || "";
+  
+  // Look for HTTP status codes (e.g. [503], [429], [401], etc.) inside square brackets
+  const bracketMatch = message.match(/\[(\d{3})\]/);
+  if (bracketMatch) {
+    return parseInt(bracketMatch[1], 10);
+  }
+
+  // Look for standalone 3-digit status codes that are common HTTP status codes
+  const standaloneMatch = message.match(/\b(400|401|403|404|429|500|503|504)\b/);
+  if (standaloneMatch) {
+    return parseInt(standaloneMatch[1], 10);
+  }
+
+  return error?.status || null;
+}
+
+/**
+ * Calls Gemini model.generateContent with automatic retry on 503/429 up to 3 times.
+ * Retry delays: 1s, 2s, 4s.
+ */
+async function callGeminiWithRetry(model, prompt) {
+  let attempt = 0;
+  const maxAttempts = 4; // 1 initial + 3 retries
+
+  while (attempt < maxAttempts) {
+    try {
+      return await model.generateContent(prompt);
+    } catch (error) {
+      attempt++;
+      if (attempt >= maxAttempts) {
+        throw error;
+      }
+
+      const statusCode = getErrorStatusCode(error);
+      const isRetryable = statusCode === 503 || statusCode === 429;
+
+      if (!isRetryable) {
+        throw error;
+      }
+
+      const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s
+      console.warn(`Gemini API returned retryable status ${statusCode}. Retrying (attempt ${attempt}/3) in ${delay}ms...`, error);
+      
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
+/**
+ * Catch all Gemini API errors gracefully.
+ * Logs the technical error only in the browser console.
+ * Returns clean modern friendly messages.
+ * @param {Error} error - Caught error object
+ * @returns {{message: string, type: string}} Friendly message and error type
+ */
+export function parseGeminiError(error) {
+  // 5. Log the technical error only in the browser console.
+  console.error("Technical Gemini API Error:", error);
+
+  const message = error?.message || "";
+  const statusCode = getErrorStatusCode(error);
+
+  const isNetwork = !navigator.onLine || 
+                    message.toLowerCase().includes("failed to fetch") || 
+                    message.toLowerCase().includes("network error") ||
+                    message.toLowerCase().includes("dns") ||
+                    message.toLowerCase().includes("unable to connect");
+
+  if (isNetwork) {
+    return {
+      type: 'NETWORK_ERROR',
+      message: 'Unable to connect to Gemini. Check your internet connection.'
+    };
+  }
+
+  switch (statusCode) {
+    case 503:
+      return {
+        type: 'SERVICE_UNAVAILABLE',
+        message: "Gemini AI service is temporarily busy. This occasionally happens during peak usage. We'll retry automatically."
+      };
+    case 429:
+      return {
+        type: 'RATE_LIMIT',
+        message: 'Rate limit reached. Please wait a few moments before trying again.'
+      };
+    case 401:
+    case 403:
+      return {
+        type: 'INVALID_API_KEY',
+        message: 'Invalid API key. Please check your Gemini API key.'
+      };
+    case 500:
+      return {
+        type: 'INTERNAL_ERROR',
+        message: 'Gemini API is currently experiencing an internal error. Please try again later.'
+      };
+    default:
+      if (message.includes("API key is not configured")) {
+        return {
+          type: 'INVALID_API_KEY',
+          message: 'Invalid API key. Please check your Gemini API key.'
+        };
+      }
+      return {
+        type: 'UNKNOWN_ERROR',
+        message: 'An unexpected error occurred during Gemini optimization. Please try again.'
+      };
+  }
 }

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Copy, Check, RefreshCw, Loader2, Download } from 'lucide-react';
-import { generateCoverLetter } from '../services/geminiService';
+import { generateCoverLetter, parseGeminiError } from '../services/geminiService';
+import ApiErrorNotification from './ApiErrorNotification';
 
 export default function CoverLetterTailor({ resumeText, jobDescription, coverLetter, onCoverLetterUpdated }) {
   const [tone, setTone] = useState('Professional');
   const [length, setLength] = useState('Standard');
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
   const tones = ['Professional', 'Bold', 'Enthusiastic', 'Creative'];
   const lengths = ['Short', 'Standard', 'Detailed'];
@@ -32,12 +34,13 @@ export default function CoverLetterTailor({ resumeText, jobDescription, coverLet
 
   const handleRegenerate = async () => {
     setIsRegenerating(true);
+    setApiError(null);
     try {
       const updatedLetter = await generateCoverLetter(resumeText, jobDescription, tone, length);
       onCoverLetterUpdated(updatedLetter);
     } catch (err) {
-      console.error(err);
-      alert(err.message || 'Failed to regenerate cover letter. Please verify your API key.');
+      const parsed = parseGeminiError(err);
+      setApiError(parsed);
     } finally {
       setIsRegenerating(false);
     }
@@ -134,6 +137,14 @@ export default function CoverLetterTailor({ resumeText, jobDescription, coverLet
           </button>
         </div>
       </div>
+
+      {apiError && (
+        <ApiErrorNotification 
+          error={apiError} 
+          onRetry={handleRegenerate} 
+          onClose={() => setApiError(null)} 
+        />
+      )}
 
       {/* Cover Letter Document Layout */}
       <div className="letter-wrapper" style={{ position: 'relative' }}>

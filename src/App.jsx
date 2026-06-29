@@ -9,10 +9,11 @@ import ResumeTailor from './components/ResumeTailor';
 import CoverLetterTailor from './components/CoverLetterTailor';
 import EmptyState from './components/EmptyState';
 import ApiKeyModal from './components/ApiKeyModal';
+import ApiErrorNotification from './components/ApiErrorNotification';
 
 import { SAMPLE_RESUME, SAMPLE_JOB_DESCRIPTION } from './utils/sampleData';
 import { getHistory, saveSession, deleteSession, clearAllHistory } from './services/historyService';
-import { analyzeResumeMatch, generateTailoredResume, generateCoverLetter } from './services/geminiService';
+import { analyzeResumeMatch, generateTailoredResume, generateCoverLetter, parseGeminiError } from './services/geminiService';
 
 export default function App() {
   const [resumeText, setResumeText] = useState('');
@@ -27,6 +28,7 @@ export default function App() {
   const [matchAnalysis, setMatchAnalysis] = useState(null);
   const [tailoredResume, setTailoredResume] = useState('');
   const [tailoredCoverLetter, setTailoredCoverLetter] = useState('');
+  const [apiError, setApiError] = useState(null);
 
   // History state
   const [sessions, setSessions] = useState([]);
@@ -122,6 +124,7 @@ export default function App() {
       return;
     }
     setIsGenerating(true);
+    setApiError(null);
     try {
       const [matchRes, resumeRes, coverRes] = await Promise.all([
         analyzeResumeMatch(resumeText, jobDescription),
@@ -148,8 +151,8 @@ export default function App() {
       
       setActiveTab('match');
     } catch (err) {
-      console.error(err);
-      alert(err.message || 'An error occurred during Gemini optimization. Please check your API key configuration.');
+      const parsed = parseGeminiError(err);
+      setApiError(parsed);
     } finally {
       setIsGenerating(false);
     }
@@ -316,6 +319,14 @@ export default function App() {
                         </button>
                       )}
                     </div>
+
+                    {apiError && (
+                      <ApiErrorNotification 
+                        error={apiError} 
+                        onRetry={triggerOptimization} 
+                        onClose={() => setApiError(null)} 
+                      />
+                    )}
 
                     <div className="inputs-layout" style={{
                       display: 'grid',

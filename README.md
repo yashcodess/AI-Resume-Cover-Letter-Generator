@@ -1,4 +1,11 @@
-# AI Resume Optimizer
+<p align="center">
+  <img src="https://raw.githubusercontent.com/yashcodess/AI-Resume-Cover-Letter-Generator/main/public/github-banner.png" width="100%" alt="AI Resume Optimizer Banner"/>
+</p>
+
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Outfit&size=30&duration=3500&pause=1000&color=8B5CF6&center=true&vCenter=true&width=850&lines=AI+Resume+Optimizer;ATS+Resume+Analyzer;Gemini+Powered+Resume+Generator;React+%7C+Vite+%7C+Google+Gemini+API"/>
+</p>
+
 
 <div align="center">
 
